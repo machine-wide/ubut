@@ -1,5 +1,6 @@
-# ubut
+# ubut&trade;
 ubench + utests = ubut
+<font size="1">(it also created unique and somewhat ridiculous soundibg name)</font>
 
 Inspired by [Sheredom](https://twitter.com/sheredom) [UTEST](https://github.com/sheredom/utest.h) and [UBENCH](https://github.com/sheredom/ubench.h)
 Please respect the copyright and licsensing from there.

@@ -36,7 +36,7 @@ struct utest_test_state_s {
 	char* name;
 };
 
-static struct utest_test_state_s empty_utest_test_state_s = { NULL, 0, NULL };
+// static struct utest_test_state_s empty_utest_test_state_s = { NULL, 0, NULL };
 
 struct utest_state_s {
 	struct utest_test_state_s* tests;
@@ -60,6 +60,7 @@ UBUT_EXTERN struct utest_state_s utest_state;
 UBUT_INFO( __VA_ARGS__ ) ; \
 } while(0)
 
+#define UTEST_HAVING_TYPE_PRINTERS
 #ifdef UTEST_HAVING_TYPE_PRINTERS
 
 #if defined(UBUT_OVERLOADABLE)
@@ -366,8 +367,8 @@ utest_type_printer(long long unsigned int i) {
 	return;                                                                    \
   }
 
+// UBUT_EXTERN struct utest_state_s utest_state;                               
 #define UTEST(SET, NAME)                                                       \
-  UBUT_EXTERN struct utest_state_s utest_state;                               \
   static void utest_run_##SET##_##NAME(int *utest_result);                     \
   static void utest_##SET##_##NAME(int *utest_result, size_t utest_index) {    \
 	(void)utest_index;                                                         \
@@ -389,97 +390,6 @@ utest_type_printer(long long unsigned int i) {
 	UBUT_SNPRINTF(name, name_size, "%s", name_part);                          \
   }                                                                            \
   void utest_run_##SET##_##NAME(int *utest_result)
-
-#ifdef UTEST_HAVING_FIXTURES 
-
-#define UTEST_F_SETUP(FIXTURE)                                                 \
-  static void utest_f_setup_##FIXTURE(int *utest_result,                       \
-									  struct FIXTURE *utest_fixture)
-
-#define UTEST_F_TEARDOWN(FIXTURE)                                              \
-  static void utest_f_teardown_##FIXTURE(int *utest_result,                    \
-										 struct FIXTURE *utest_fixture)
-
-#define UTEST_F(FIXTURE, NAME)                                                 \
-  UBUT_EXTERN struct utest_state_s utest_state;                               \
-  static void utest_f_setup_##FIXTURE(int *, struct FIXTURE *);                \
-  static void utest_f_teardown_##FIXTURE(int *, struct FIXTURE *);             \
-  static void utest_run_##FIXTURE##_##NAME(int *, struct FIXTURE *);           \
-  static void utest_f_##FIXTURE##_##NAME(int *utest_result,                    \
-										 size_t utest_index) {                 \
-	struct FIXTURE fixture;                                                    \
-	(void)utest_index;                                                         \
-	memset(&fixture, 0, sizeof(fixture));                                      \
-	utest_f_setup_##FIXTURE(utest_result, &fixture);                           \
-	if (0 != *utest_result) {                                                  \
-	  return;                                                                  \
-	}                                                                          \
-	utest_run_##FIXTURE##_##NAME(utest_result, &fixture);                      \
-	utest_f_teardown_##FIXTURE(utest_result, &fixture);                        \
-  }                                                                            \
-  UBUT_INITIALIZER(utest_register_##FIXTURE##_##NAME) {                       \
-	const size_t index = utest_state.tests_length++;                           \
-	const char *name_part = #FIXTURE "." #NAME;                                \
-	const size_t name_size = strlen(name_part) + 1;                            \
-	char *name = UBUT_PTR_CAST(char *, malloc(name_size));                    \
-	utest_state.tests =                                                        \
-		UBUT_PTR_CAST(struct utest_test_state_s *,                            \
-					   realloc(UBUT_PTR_CAST(void *, utest_state.tests),      \
-							   sizeof(struct utest_test_state_s) *             \
-								   utest_state.tests_length));                 \
-	utest_state.tests[index].func = &utest_f_##FIXTURE##_##NAME;               \
-	utest_state.tests[index].name = name;                                      \
-	UBUT_SNPRINTF(name, name_size, "%s", name_part);                          \
-  }                                                                            \
-  void utest_run_##FIXTURE##_##NAME(int *utest_result,                         \
-									struct FIXTURE *utest_fixture)
-
-#define UTEST_I_SETUP(FIXTURE)                                                 \
-  static void utest_i_setup_##FIXTURE(                                         \
-	  int *utest_result, struct FIXTURE *utest_fixture, size_t utest_index)
-
-#define UTEST_I_TEARDOWN(FIXTURE)                                              \
-  static void utest_i_teardown_##FIXTURE(                                      \
-	  int *utest_result, struct FIXTURE *utest_fixture, size_t utest_index)
-
-#define UTEST_I(FIXTURE, NAME, INDEX)                                          \
-  UBUT_EXTERN struct utest_state_s utest_state;                               \
-  static void utest_run_##FIXTURE##_##NAME##_##INDEX(int *, struct FIXTURE *); \
-  static void utest_i_##FIXTURE##_##NAME##_##INDEX(int *utest_result,          \
-												   size_t index) {             \
-	struct FIXTURE fixture;                                                    \
-	memset(&fixture, 0, sizeof(fixture));                                      \
-	utest_i_setup_##FIXTURE(utest_result, &fixture, index);                    \
-	if (0 != *utest_result) {                                                  \
-	  return;                                                                  \
-	}                                                                          \
-	utest_run_##FIXTURE##_##NAME##_##INDEX(utest_result, &fixture);            \
-	utest_i_teardown_##FIXTURE(utest_result, &fixture, index);                 \
-  }                                                                            \
-  UBUT_INITIALIZER(utest_register_##FIXTURE##_##NAME##_##INDEX) {             \
-	size_t i;                                                                  \
-	ubut_uint64_t iUp;                                                        \
-	for (i = 0; i < (INDEX); i++) {                                            \
-	  const size_t index = utest_state.tests_length++;                         \
-	  const char *name_part = #FIXTURE "." #NAME;                              \
-	  const size_t name_size = strlen(name_part) + 32;                         \
-	  char *name = UBUT_PTR_CAST(char *, malloc(name_size));                  \
-	  utest_state.tests =                                                      \
-		  UBUT_PTR_CAST(struct utest_test_state_s *,                          \
-						 realloc(UBUT_PTR_CAST(void *, utest_state.tests),    \
-								 sizeof(struct utest_test_state_s) *           \
-									 utest_state.tests_length));               \
-	  utest_state.tests[index].func = &utest_i_##FIXTURE##_##NAME##_##INDEX;   \
-	  utest_state.tests[index].index = i;                                      \
-	  utest_state.tests[index].name = name;                                    \
-	  iUp = UBUT_CAST(ubut_uint64_t, i);                                     \
-	  UBUT_SNPRINTF(name, name_size, "%s/%" UBUT_PRIu64, name_part, iUp);    \
-	}                                                                          \
-  }                                                                            \
-  void utest_run_##FIXTURE##_##NAME##_##INDEX(int *utest_result,               \
-											  struct FIXTURE *utest_fixture)
-
-#endif // UTEST_HAVING_FIXTURES 
 
 UBUT_FORCEINLINE int utest_should_filter_test(const char* filter, const char* testcase);
 UBUT_FORCEINLINE int utest_should_filter_test(const char* filter,
@@ -565,8 +475,8 @@ UBUT_FORCEINLINE int utest_should_filter_test(const char* filter,
 #define  PFX_PASSED "[  PASSED  ]"
 #define      PFX_OK "[      OK  ]"
 
-UBUT_FORCEINLINE int utest_main(int argc, const char* const argv[]);
-UBUT_FORCEINLINE int utest_main(int argc, const char* const argv[]) {
+/*UBUT_FORCEINLINE*/ UBUT_EXTERN int utest_main(int argc, const char* const argv[]);
+/*UBUT_FORCEINLINE*/ UBUT_EXTERN inline int utest_main(int argc, const char* const argv[]) {
 	ubut_uint64_t failed = 0;
 	size_t* failed_testcases = UBUT_NULL;
 	size_t failed_testcases_length = 0;
@@ -660,10 +570,10 @@ UBUT_FORCEINLINE int utest_main(int argc, const char* const argv[]) {
 
 			failed_testcases[failed_testcase_index] = index_;
 			failed++;
-			UTEST_REZ_OUT(PFX_FAILED "%s (%" UBUT_PRId64 "nanosecs_)", utest_state.tests[index_].name, nanosecs_);
+			UTEST_REZ_OUT(PFX_FAILED "%s (%" UBUT_PRId64 " nanosecs)", utest_state.tests[index_].name, nanosecs_);
 		}
 		else {
-			UTEST_REZ_OUT(PFX_OK "%s (%" UBUT_PRId64 "nanosecs_)", utest_state.tests[index_].name, nanosecs_);
+			UTEST_REZ_OUT(PFX_OK "%s (%" UBUT_PRId64 " nanosecs)", utest_state.tests[index_].name, nanosecs_);
 		}
 	} // for()
 
@@ -720,7 +630,7 @@ cleanup:
    UTEST_STATE ... no warnings
 
 */
-#define UTEST_STATE extern struct utest_state_s utest_state = { NULL , 0, 0}
+#define UTEST_STATE /*extern*/ struct utest_state_s utest_state = { NULL , 0, 0}
 
 /*
    define a main() function to call into utest.h and start executing tests! A

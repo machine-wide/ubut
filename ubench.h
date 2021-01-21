@@ -441,11 +441,11 @@ UBUT_C_FUNC UBUT_NOINLINE void ubench_do_nothing(void *const);
    exactly one source file, use the UBENCH_STATE macro to declare a global
    struct variable that ubench requires.
 
- #define UBENCH_MAIN()                                                          \
-  UBENCH_STATE();                                                              \
-  int main(int argc, const char *const argv[]) {                               \
-    return ubench_main(argc, argv);                                            \
+ #define UBENCH_MAIN()                   \
+  UBENCH_STATE; // note there is no ()!  \
+  int main(int argc, const char *const argv[]) { \
+    return ubench_main(argc, argv);      \
   }
-  */
+*/
 
 #endif /* UBUT_UBENCH_H_INCLUDED */

@@ -367,9 +367,9 @@ utest_type_printer(long long unsigned int i) {
 	return;                                                                    \
   }
 
-// UBUT_EXTERN struct utest_state_s utest_state;                               
 #define UTEST(SET, NAME)                                                       \
-  static void utest_run_##SET##_##NAME(int *utest_result);                     \
+ UBUT_EXTERN struct utest_state_s utest_state;                               \
+static void utest_run_##SET##_##NAME(int *utest_result);                     \
   static void utest_##SET##_##NAME(int *utest_result, size_t utest_index) {    \
 	(void)utest_index;                                                         \
 	utest_run_##SET##_##NAME(utest_result);                                    \
@@ -630,7 +630,7 @@ cleanup:
    UTEST_STATE ... no warnings
 
 */
-#define UTEST_STATE /*extern*/ struct utest_state_s utest_state = { NULL , 0, 0}
+#define UTEST_STATE struct utest_state_s utest_state = { NULL , 0, 0}
 
 /*
    define a main() function to call into utest.h and start executing tests! A
@@ -639,10 +639,10 @@ cleanup:
    file, use the UTEST_STATE macro to declare a global struct variable that
    utest requires.
 
-#define UTEST_MAIN()                                                           \
-  UTEST_STATE();                                                               \
-  int main(int argc, const char *const argv[]) {                               \
-	return utest_main(argc, argv);                                             \
+#define UTEST_MAIN()                        \
+  UTEST_STATE;   // <-- note there is no ()! \
+  int main(int argc, const char *const argv[]) {\
+	return utest_main(argc, argv);          \
   }
 */
 #endif /* SHEREDOM_UTEST_H_INCLUDED */

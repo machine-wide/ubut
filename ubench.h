@@ -190,7 +190,7 @@ UBUT_INFO( "failed test. Defaults to 2.5%%" ) ;
         UBUT_INFO("List of benchmarks");
         UBUT_INFO(" ");
         for (index = 0; index < ubench_state.benchmarks_length; index++) {
-            UBUT_INFO("%-4d: %s", index, ubench_state.benchmarks[index].name);
+            UBUT_INFO("%-4zu: %s", index, ubench_state.benchmarks[index].name);
         }
         UBUT_INFO(" ");
         UBUT_INFO("To run exact benchmark or group, filtered by name, use the --filter option");
@@ -399,12 +399,16 @@ UBUT_C_FUNC UBUT_NOINLINE void ubench_do_nothing(void *const);
 
 #define UBENCH_DO_NOTHING(x) ubench_do_nothing(x)
 
+// NOTE! that __asm bellow was necessary instead of asm
+// when compiled with /clang:-std=c99  or 11 or 17 ... 
+// using clang-cl.exe obviously
+
 #ifdef  __clang__
 #define UBENCH_DECLARE_DO_NOTHING()                                            \
   void ubench_do_nothing(void *ptr) {                                          \
     _Pragma("clang diagnostic push")                                           \
         _Pragma("clang diagnostic ignored \"-Wlanguage-extension-token\"");    \
-    asm volatile("" : : "r,m"(ptr) : "memory");                                \
+    __asm volatile("" : : "r,m"(ptr) : "memory");                                \
     _Pragma("clang diagnostic pop");                                           \
   }
 

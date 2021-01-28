@@ -8,7 +8,7 @@
 /*
 -------------------------------------------------------------------------------
 nicked from <yvals_core.h>
-this is used in the MS STL source whenever they use what they do 
+this is used in the MS STL source whenever they use what they do
 advise customers not to use ;)
 */
 
@@ -16,12 +16,12 @@ advise customers not to use ;)
 #ifndef _STL_DISABLE_DEPRECATED_WARNING
 #ifdef __clang__
 #define _STL_DISABLE_DEPRECATED_WARNING \
-    _Pragma("clang diagnostic push")    \
-    _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+	_Pragma("clang diagnostic push")    \
+	_Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
 #else // __clang__
 #define _STL_DISABLE_DEPRECATED_WARNING \
-    __pragma(warning(push))             \
-    __pragma(warning(disable : 4996)) // was declared deprecated
+	__pragma(warning(push))             \
+	__pragma(warning(disable : 4996)) // was declared deprecated
 #endif // __clang__
 #endif // _STL_DISABLE_DEPRECATED_WARNING
 // clang-format on
@@ -39,13 +39,13 @@ advise customers not to use ;)
 #define _Compiler_barrier() _STL_DISABLE_DEPRECATED_WARNING _ReadWriteBarrier() _STL_RESTORE_DEPRECATED_WARNING
 #endif
 /*
-official advice is not to use _ReadWriteBarrier, but then there is a lot of _Compiler_barrier() all arround the 
+official advice is not to use _ReadWriteBarrier, but then there is a lot of _Compiler_barrier() all arround the
 <atomic> et all in the MS STL code
 */
 
 /*
 -------------------------------------------------------------------------------
-set the WINVER and _WIN32_WINNT macros to the oldest supported platform 
+set the WINVER and _WIN32_WINNT macros to the oldest supported platform
 #include <winsdkver.h>
 */
 
@@ -82,9 +82,9 @@ set the WINVER and _WIN32_WINNT macros to the oldest supported platform
 
 
 /*
-    io.h contains definitions for some structures with natural padding. This is
-    uninteresting, but for some reason MSVC's behaviour is to warn about
-    including this system header. That *is* interesting
+	io.h contains definitions for some structures with natural padding. This is
+	uninteresting, but for some reason MSVC's behaviour is to warn about
+	including this system header. That *is* interesting
 */
 #pragma warning(disable : 4820)
 #pragma warning(push, 1)
@@ -106,8 +106,8 @@ UBUT stuff begins here
 #endif
 
 
-/* 
-clang_cl.exe is LLVM c++ compiler compiled by MSFT and included 
+/*
+clang_cl.exe is LLVM c++ compiler compiled by MSFT and included
 with VS 2019
 */
 #undef UBUT_IS_CLANG_CL
@@ -185,7 +185,7 @@ typedef unsigned __int64 ubut_uint64_t;
   static void __cdecl f(void);                                                 \
   __pragma(comment(linker, "/include:" UBUT_SYMBOL_PREFIX #f "_"));          \
   UBUT_C_FUNC __declspec(allocate(".CRT$XCU")) void(__cdecl * f##_)(void) =  \
-      f;                                                                       \
+	  f;                                                                       \
   static void __cdecl f(void)
 
 // clang on win aka clang-cl.exe
@@ -243,50 +243,53 @@ typedef unsigned __int64 ubut_uint64_t;
 //#endif
 
 static UBUT_FORCEINLINE int ubut_strncmp
-(const char *a, const char *b, size_t n) 
+(const char* a, const char* b, size_t n)
 {
-  /* strncmp breaks on Wall / Werror on gcc/clang, so we avoid using it */
-  unsigned i;
+	/* strncmp breaks on Wall / Werror on gcc/clang, so we avoid using it */
+	unsigned i;
 
-  for (i = 0; i < n; i++) {
-    if (a[i] < b[i]) {
-      return -1;
-    } else if (a[i] > b[i]) {
-      return 1;
-    }
-  }
+	for (i = 0; i < n; i++) {
+		if (a[i] < b[i]) {
+			return -1;
+		}
+		else if (a[i] > b[i]) {
+			return 1;
+		}
+	}
 
-  return 0;
+	return 0;
 }
 
-static UBUT_FORCEINLINE FILE * ubut_fopen(const char *filename,
-                                        const char *mode) {
+static UBUT_FORCEINLINE FILE* ubut_fopen(const char* filename,
+	const char* mode) {
 #ifdef UBUT_IS_WIN
-  FILE *file;
-  if (0 == fopen_s(&file, filename, mode)) {
-    return file;
-  } else {
-    return 0;
-  }
+	FILE* file;
+	if (0 == fopen_s(&file, filename, mode)) {
+		return file;
+	}
+	else {
+		return 0;
+	}
 #else
-  return fopen(filename, mode);
+	return fopen(filename, mode);
 #endif
 }
 
 
 static UBUT_FORCEINLINE ubut_int64_t ubut_ns(void) {
-    //#ifdef UBENCH_IS_WIN
-    LARGE_INTEGER counter;
-    LARGE_INTEGER frequency;
-    QueryPerformanceCounter(&counter);
-    QueryPerformanceFrequency(&frequency);
-    return UBUT_CAST(ubut_int64_t,
-        (counter.QuadPart * 1000000000) / frequency.QuadPart);
+	//#ifdef UBENCH_IS_WIN
+	LARGE_INTEGER counter;
+	LARGE_INTEGER frequency;
+	QueryPerformanceCounter(&counter);
+	QueryPerformanceFrequency(&frequency);
+	return UBUT_CAST(ubut_int64_t,
+		(counter.QuadPart * 1000000000) / frequency.QuadPart);
 }
 
 /*
 -------------------------------------------------------------------------------
-CAUTION: This is compile time. 
+CAUTION: This is compile time. You must define  _WIN32_WINNT in project settings.
+(and WINVER too)
 
 Meaning: you compile and run on W10 and all is fine.
 But, you run the same exe on W7, and squigly bits will be shown instead of colours
@@ -316,6 +319,15 @@ If you check at runtime and stop if running bellow W10, in that respect you will
 #define UBUT_VT_RED UBUT_VT_ESC ""
 #define UBUT_VT_MAGENTA UBUT_VT_ESC ""
 #endif
+/*
+* this is potentially redefined in ubut_print.h
+*/
+#define UBUT_TRACE(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_GRAY   ), fprintf( stderr, __VA_ARGS__)
+#define UBUT_DEBUG(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_GREEN  ), fprintf( stderr, __VA_ARGS__)
+#define UBUT_INFO(...)  fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_CYAN   ), fprintf( stderr, __VA_ARGS__)
+#define UBUT_WARN(...)  fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_YELLOW ), fprintf( stderr, __VA_ARGS__)
+#define UBUT_ERROR(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_RED    ), fprintf( stderr, __VA_ARGS__)
+#define UBUT_FATAL(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_RED    ), fprintf( stderr, __VA_ARGS__)
 
 /*
 -------------------------------------------------------------------------------

@@ -513,7 +513,7 @@ UBUT_FORCEINLINE int utest_should_filter_test(const char* filter,
 			UBUT_INFO("List of tests");
 			UBUT_INFO(" ");
 			for (index = 0; index < utest_state.tests_length; index++) {
-				UBUT_INFO("%-4d: %s", index, utest_state.tests[index].name);
+				UBUT_INFO("%-4d: %s", (int)index, utest_state.tests[index].name);
 			}
 			UBUT_INFO(" ");
 			UBUT_INFO("To run exact test or group, filtered by name, use the --filter option");

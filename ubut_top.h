@@ -275,7 +275,11 @@ static UBUT_FORCEINLINE FILE* ubut_fopen(const char* filename,
 #endif
 }
 
-
+/*
+CAUTION: this is WIN32 only version that replaces 
+utest_ns() and ubut_ns() from original OS agnostic
+separate headers utest.h and ubench.h
+*/
 static UBUT_FORCEINLINE ubut_int64_t ubut_ns(void) {
 	//#ifdef UBENCH_IS_WIN
 	LARGE_INTEGER counter;

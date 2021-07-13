@@ -148,8 +148,8 @@ UBUT_FORCEINLINE int ubench_should_filter(const char *filter,
 #define  PFX_PASSED "[  PASSED  ]"
 #define      PFX_OK "[      OK  ]"
 
-UBUT_FORCEINLINE int ubench_main(int /*argc*/, const char *const /*argv*/[]);
-UBUT_FORCEINLINE int ubench_main(int argc, const char *const argv[]) {
+/*UBUT_FORCEINLINE*/ UBUT_NOINLINE int ubench_main(int /*argc*/, const char *const /*argv*/[]);
+/*UBUT_FORCEINLINE*/ UBUT_NOINLINE int ubench_main(int argc, const char *const argv[]) {
   ubut_uint64_t failed = 0;
   size_t index = 0;
   size_t *failed_benchmarks = UBUT_NULL;

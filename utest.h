@@ -601,6 +601,8 @@ cleanup:
 		fclose(utest_state.output);
 	}
 
+	UBUT_CONSOLE_COLOR_RESET();
+
 	return UBUT_CAST(int, failed);
 } // utest_main
 

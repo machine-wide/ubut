@@ -378,8 +378,11 @@ cleanup:
     fclose(ubench_state.output);
   }
 
+  UBUT_CONSOLE_COLOR_RESET();
+
   return UBUT_CAST(int, failed);
-}
+  
+} // ubench_main
 
 #undef HELP_STR
 #undef LIST_STR

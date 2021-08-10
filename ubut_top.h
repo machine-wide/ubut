@@ -1,7 +1,7 @@
 #ifndef UBUT_TOP_INC
 #define UBUT_TOP_INC
 
-#if defined(__clang__) 
+#if defined(__clang__)
 #pragma clang system_header
 #endif // __clang__
 
@@ -80,7 +80,6 @@ set the WINVER and _WIN32_WINNT macros to the oldest supported platform
 #include <string.h>
 // #include <inttypes.h>
 
-
 /*
 	io.h contains definitions for some structures with natural padding. This is
 	uninteresting, but for some reason MSVC's behaviour is to warn about
@@ -104,7 +103,6 @@ UBUT stuff begins here
 /* but then ... */
 #error This is WIN32 only, for OS agnostic experience please use sheredom/ubench from GitHub
 #endif
-
 
 /*
 clang_cl.exe is LLVM c++ compiler compiled by MSFT and included
@@ -181,24 +179,24 @@ typedef unsigned __int64 ubut_uint64_t;
 #endif
 
 #pragma section(".CRT$XCU", read)
-#define UBUT_INITIALIZER(f)                                                  \
-  static void __cdecl f(void);                                                 \
-  __pragma(comment(linker, "/include:" UBUT_SYMBOL_PREFIX #f "_"));          \
-  UBUT_C_FUNC __declspec(allocate(".CRT$XCU")) void(__cdecl * f##_)(void) =  \
-	  f;                                                                       \
-  static void __cdecl f(void)
+#define UBUT_INITIALIZER(f)                                                   \
+	static void __cdecl f(void);                                              \
+	__pragma(comment(linker, "/include:" UBUT_SYMBOL_PREFIX #f "_"));         \
+	UBUT_C_FUNC __declspec(allocate(".CRT$XCU")) void(__cdecl * f##_)(void) = \
+		f;                                                                    \
+	static void __cdecl f(void)
 
 // clang on win aka clang-cl.exe
 #ifdef __clang__
 #undef UBUT_INITIALIZER
-#define UBUT_INITIALIZER(f)                                                  \
-  static void f(void) __attribute__((constructor));                            \
-  static void f(void)
+#define UBUT_INITIALIZER(f)                           \
+	static void f(void) __attribute__((constructor)); \
+	static void f(void)
 #endif // __clang__
 
 #define __STDC_FORMAT_MACROS 1
 
-#if defined(__clang__) && defined( __has_warning )
+#if defined(__clang__) && defined(__has_warning)
 #if __has_warning("-Wreserved-id-macro")
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -242,17 +240,19 @@ typedef unsigned __int64 ubut_uint64_t;
 //#endif
 //#endif
 
-static UBUT_FORCEINLINE int ubut_strncmp
-(const char* a, const char* b, size_t n)
+static UBUT_FORCEINLINE int ubut_strncmp(const char *a, const char *b, size_t n)
 {
 	/* strncmp breaks on Wall / Werror on gcc/clang, so we avoid using it */
 	unsigned i;
 
-	for (i = 0; i < n; i++) {
-		if (a[i] < b[i]) {
+	for (i = 0; i < n; i++)
+	{
+		if (a[i] < b[i])
+		{
 			return -1;
 		}
-		else if (a[i] > b[i]) {
+		else if (a[i] > b[i])
+		{
 			return 1;
 		}
 	}
@@ -260,14 +260,17 @@ static UBUT_FORCEINLINE int ubut_strncmp
 	return 0;
 }
 
-static UBUT_FORCEINLINE FILE* ubut_fopen(const char* filename,
-	const char* mode) {
+static UBUT_FORCEINLINE FILE *ubut_fopen(const char *filename,
+										 const char *mode)
+{
 #ifdef UBUT_IS_WIN
-	FILE* file;
-	if (0 == fopen_s(&file, filename, mode)) {
+	FILE *file;
+	if (0 == fopen_s(&file, filename, mode))
+	{
 		return file;
 	}
-	else {
+	else
+	{
 		return 0;
 	}
 #else
@@ -280,14 +283,15 @@ CAUTION: this is WIN32 only version that replaces
 utest_ns() and ubut_ns() from original OS agnostic
 separate headers utest.h and ubench.h
 */
-static UBUT_FORCEINLINE ubut_int64_t ubut_ns(void) {
+static UBUT_FORCEINLINE ubut_int64_t ubut_ns(void)
+{
 	//#ifdef UBENCH_IS_WIN
 	LARGE_INTEGER counter;
 	LARGE_INTEGER frequency;
 	QueryPerformanceCounter(&counter);
 	QueryPerformanceFrequency(&frequency);
 	return UBUT_CAST(ubut_int64_t,
-		(counter.QuadPart * 1000000000) / frequency.QuadPart);
+					 (counter.QuadPart * 1000000000) / frequency.QuadPart);
 }
 
 /*
@@ -326,12 +330,21 @@ If you check at runtime and stop if running bellow W10, in that respect you will
 /*
 * this is potentially redefined in ubut_print.h
 */
-#define UBUT_TRACE(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_GRAY   ), fprintf( stderr, __VA_ARGS__)
-#define UBUT_DEBUG(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_GREEN  ), fprintf( stderr, __VA_ARGS__)
-#define UBUT_INFO(...)  fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_CYAN   ), fprintf( stderr, __VA_ARGS__)
-#define UBUT_WARN(...)  fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_YELLOW ), fprintf( stderr, __VA_ARGS__)
-#define UBUT_ERROR(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_RED    ), fprintf( stderr, __VA_ARGS__)
-#define UBUT_FATAL(...) fprintf( stderr, UBUT_VT_RESET "\n" UBUT_VT_RED    ), fprintf( stderr, __VA_ARGS__)
+#define UBUT_TRACE(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_GRAY), fprintf(stderr, __VA_ARGS__)
+#define UBUT_DEBUG(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_GREEN), fprintf(stderr, __VA_ARGS__)
+#define UBUT_INFO(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_CYAN), fprintf(stderr, __VA_ARGS__)
+#define UBUT_WARN(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_YELLOW), fprintf(stderr, __VA_ARGS__)
+#define UBUT_ERROR(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_RED), fprintf(stderr, __VA_ARGS__)
+#define UBUT_FATAL(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_RED), fprintf(stderr, __VA_ARGS__)
+
+#define UBUT_CONSOLE_COLOR_RESET(...)   \
+	do                                  \
+	{                                   \
+		fprintf(stdout, UBUT_VT_RESET); \
+		fprintf(stderr, UBUT_VT_RESET); \
+		fflush(stdout);                 \
+		fflush(stderr);                 \
+	} while (0)
 
 /*
 -------------------------------------------------------------------------------

@@ -6,6 +6,9 @@
    https://github.com/sheredom/utest.h
 
    For more information, please refer to <http://unlicense.org/>
+
+
+   #define UTEST_IMPLEMENTATION  in only one compilation unit
 */
 
 #ifndef SHEREDOM_UTEST_H_INCLUDED
@@ -28,6 +31,8 @@
 #endif
 #endif
 
+UBUT_BEGIN_EXTERN_C
+
 typedef void (*utest_testcase_t)(int*, size_t);
 
 struct utest_test_state_s {
@@ -45,7 +50,7 @@ struct utest_state_s {
 };
 
 /* extern to the global state utest needs to execute */
-UBUT_EXTERN struct utest_state_s utest_state;
+ extern struct utest_state_s utest_state;
 
 #define UTEST_XML_OUT(...)    do {                                            \
   if (utest_state.output) {                                                   \
@@ -60,10 +65,19 @@ UBUT_EXTERN struct utest_state_s utest_state;
 UBUT_INFO( __VA_ARGS__ ) ; \
 } while(0)
 
+ UBUT_END_EXTERN_C
+
 #define UTEST_HAVING_TYPE_PRINTERS
+
 #ifdef UTEST_HAVING_TYPE_PRINTERS
 
-#if defined(UBUT_OVERLOADABLE)
+#ifdef __clang__
+#ifdef __cplusplus
+#define UBUT_OVERLOADABLE 
+#else
+#define UBUT_OVERLOADABLE __attribute__((overloadable))
+#endif // C++
+#endif // clang
 
 UBUT_FORCEINLINE UBUT_OVERLOADABLE void utest_type_printer(float f) {
 	UTEST_REZ_OUT("%f", UBUT_CAST(double, f));
@@ -119,12 +133,16 @@ utest_type_printer(long long unsigned int i) {
 	UTEST_REZ_OUT("%llu", i);
 }
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+//#ifdef __clang__
+//#pragma clang diagnostic pop
+//#endif
 
 #endif
-#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+
+UBUT_BEGIN_EXTERN_C
+
 #define utest_type_printer(val)                                                \
   UTEST_REZ_OUT(_Generic((val), signed char                                     \
 						: "%d", unsigned char                                  \
@@ -144,6 +162,9 @@ utest_type_printer(long long unsigned int i) {
 								   : "%p", default                             \
 								   : "undef")),                                \
 			   (val))
+
+UBUT_END_EXTERN_C
+
 #else
 /*
    we don't have the ability to print the values we got, so we create a macro
@@ -368,7 +389,7 @@ utest_type_printer(long long unsigned int i) {
   }
 
 #define UTEST(SET, NAME)                                                       \
- UBUT_EXTERN struct utest_state_s utest_state;                               \
+  /*struct utest_state_s utest_state;*/                               \
 static void utest_run_##SET##_##NAME(int *utest_result);                     \
   static void utest_##SET##_##NAME(int *utest_result, size_t utest_index) {    \
 	(void)utest_index;                                                         \
@@ -391,8 +412,13 @@ static void utest_run_##SET##_##NAME(int *utest_result);                     \
   }                                                                            \
   void utest_run_##SET##_##NAME(int *utest_result)
 
-UBUT_FORCEINLINE int utest_should_filter_test(const char* filter, const char* testcase);
-UBUT_FORCEINLINE int utest_should_filter_test(const char* filter,
+UBUT_BEGIN_EXTERN_C
+
+ int utest_should_filter_test(const char* filter, const char* testcase);
+
+#ifdef UTEST_IMPLEMENTATION
+
+ int utest_should_filter_test(const char* filter,
 	const char* testcase) {
 	if (filter) {
 		const char* filter_cur = filter;
@@ -460,6 +486,7 @@ UBUT_FORCEINLINE int utest_should_filter_test(const char* filter,
 
 	return 0;
 }
+#endif // UTEST_IMPLEMENTATION
 
 /* Informational switches */
 #define HELP_STR "--help"
@@ -475,8 +502,9 @@ UBUT_FORCEINLINE int utest_should_filter_test(const char* filter,
 #define  PFX_PASSED "[  PASSED  ]"
 #define      PFX_OK "[      OK  ]"
 
-/*UBUT_FORCEINLINE*/ UBUT_EXTERN int utest_main(int argc, const char* const argv[]);
-/*UBUT_FORCEINLINE*/ UBUT_EXTERN inline int utest_main(int argc, const char* const argv[]) {
+ int utest_main(int argc, const char* const argv[]);
+#ifdef UTEST_IMPLEMENTATION
+ int utest_main(int argc, const char* const argv[]) {
 	ubut_uint64_t failed = 0;
 	size_t* failed_testcases = UBUT_NULL;
 	size_t failed_testcases_length = 0;
@@ -605,7 +633,7 @@ cleanup:
 
 	return UBUT_CAST(int, failed);
 } // utest_main
-
+#endif // UTEST_IMPLEMENTATION
 #undef HELP_STR
 #undef LIST_STR
 #undef FILTER_STR
@@ -632,6 +660,8 @@ cleanup:
    UTEST_STATE ... no warnings
 
 */
+#ifdef UTEST_IMPLEMENTATION
+
 #define UTEST_STATE struct utest_state_s utest_state = { NULL , 0, 0}
 
 /*
@@ -647,4 +677,8 @@ cleanup:
 	return utest_main(argc, argv);          \
   }
 */
+#endif // UTEST_IMPLEMENTATION
+
+UBUT_END_EXTERN_C
+
 #endif /* SHEREDOM_UTEST_H_INCLUDED */

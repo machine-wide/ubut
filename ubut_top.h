@@ -115,14 +115,6 @@ with VS 2019
 #endif // __clang__
 #endif // _MSC_VER
 
-#if defined(__cplusplus)
-/* if we are using c++ we can use overloaded methods (its in the language) */
-#define UBUT_OVERLOADABLE
-#elif defined(__clang__)
-/* otherwise, if we are using clang with c - use the overloadable attribute */
-#define UBUT_OVERLOADABLE __attribute__((overloadable))
-#endif
-
 #ifdef __clang__
 #define UBUT_UNUSED __attribute__((unused))
 #else
@@ -240,61 +232,75 @@ typedef unsigned __int64 ubut_uint64_t;
 //#endif
 //#endif
 
-static UBUT_FORCEINLINE int ubut_strncmp(const char *a, const char *b, size_t n)
-{
-	/* strncmp breaks on Wall / Werror on gcc/clang, so we avoid using it */
-	unsigned i;
+#ifdef __cplusplus
+#define UBUT_BEGIN_EXTERN_C extern "C" {
+#else
+#define UBUT_BEGIN_EXTERN_C 
+#endif
 
-	for (i = 0; i < n; i++)
+#ifdef __cplusplus    
+#define UBUT_END_EXTERN_C }
+#else
+#define UBUT_END_EXTERN_C 
+#endif
+
+UBUT_BEGIN_EXTERN_C
+
+UBUT_FORCEINLINE int ubut_strncmp(const char *a, const char *b, size_t n)
 	{
-		if (a[i] < b[i])
+		/* strncmp breaks on Wall / Werror on gcc/clang, so we avoid using it */
+		unsigned i;
+
+		for (i = 0; i < n; i++)
 		{
-			return -1;
+			if (a[i] < b[i])
+			{
+				return -1;
+			}
+			else if (a[i] > b[i])
+			{
+				return 1;
+			}
 		}
-		else if (a[i] > b[i])
-		{
-			return 1;
-		}
-	}
 
-	return 0;
-}
-
-static UBUT_FORCEINLINE FILE *ubut_fopen(const char *filename,
-										 const char *mode)
-{
-#ifdef UBUT_IS_WIN
-	FILE *file;
-	if (0 == fopen_s(&file, filename, mode))
-	{
-		return file;
-	}
-	else
-	{
 		return 0;
 	}
-#else
-	return fopen(filename, mode);
-#endif
-}
 
-/*
+UBUT_FORCEINLINE FILE *ubut_fopen(const char *filename, const char *mode)
+	{
+#ifdef UBUT_IS_WIN
+		FILE *file;
+		if (0 == fopen_s(&file, filename, mode))
+		{
+			return file;
+		}
+		else
+		{
+			return 0;
+		}
+#else
+		return fopen(filename, mode);
+#endif
+	}
+
+	/*
 CAUTION: this is WIN32 only version that replaces 
 utest_ns() and ubut_ns() from original OS agnostic
 separate headers utest.h and ubench.h
 */
-static UBUT_FORCEINLINE ubut_int64_t ubut_ns(void)
-{
-	//#ifdef UBENCH_IS_WIN
-	LARGE_INTEGER counter;
-	LARGE_INTEGER frequency;
-	QueryPerformanceCounter(&counter);
-	QueryPerformanceFrequency(&frequency);
-	return UBUT_CAST(ubut_int64_t,
-					 (counter.QuadPart * 1000000000) / frequency.QuadPart);
-}
+UBUT_FORCEINLINE ubut_int64_t ubut_ns(void)
+	{
+		//#ifdef UBENCH_IS_WIN
+		LARGE_INTEGER counter;
+		LARGE_INTEGER frequency;
+		QueryPerformanceCounter(&counter);
+		QueryPerformanceFrequency(&frequency);
+		return UBUT_CAST(ubut_int64_t,
+						 (counter.QuadPart * 1000000000) / frequency.QuadPart);
+	}
 
-/*
+UBUT_END_EXTERN_C
+	/*
 -------------------------------------------------------------------------------
 CAUTION: This is compile time. You must define  _WIN32_WINNT in project settings.
 (and WINVER too)
@@ -327,6 +333,9 @@ If you check at runtime and stop if running bellow W10, in that respect you will
 #define UBUT_VT_RED UBUT_VT_ESC ""
 #define UBUT_VT_MAGENTA UBUT_VT_ESC ""
 #endif
+
+
+#define DBJ_UBUT_SIMPLE_LOG // THE BIG ISSUE
 
 #ifdef DBJ_UBUT_SIMPLE_LOG
 #define DBJ_SIMPLELOG_USER_DEFINED_MACRO_NAMES

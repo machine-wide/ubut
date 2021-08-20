@@ -6,7 +6,9 @@
 */
 
 #include "ubut_top.h"
-// #include "ubut_print.h"
+
+UBUT_BEGIN_EXTERN_C
+
 
 typedef void (*ubench_benchmark_t)(ubut_int64_t* const, const ubut_int64_t);
 
@@ -22,8 +24,12 @@ struct ubench_state_s {
 	double confidence;
 };
 
+// #ifdef UBENCH_IMPLEMENTATION
 /* extern to the global state ubench needs to execute */
-UBUT_EXTERN struct ubench_state_s ubench_state;
+ extern struct ubench_state_s ubench_state;
+// #endif // UBENCH_IMPLEMENTATION
+
+
 
 #define UBENCH_REZ_OUT(...)                                                     \
   if (ubench_state.output) {                                                   \
@@ -36,7 +42,7 @@ ubench begins here
 */
 
 #define UBENCH(SET, NAME)                                                      \
-  UBUT_EXTERN struct ubench_state_s ubench_state;                            \
+   /* struct ubench_state_s ubench_state; */                            \
   static void ubench_run_##SET##_##NAME(void);                                 \
   static void ubench_##SET##_##NAME(ubut_int64_t *const ns,                  \
 									const ubut_int64_t size) {               \
@@ -65,6 +71,8 @@ ubench begins here
 
 UBUT_FORCEINLINE
 int ubench_should_filter(const char* filter, const char* benchmark);
+
+#ifdef UBENCH_IMPLEMENTATION
 
 UBUT_FORCEINLINE int ubench_should_filter(const char* filter,
 	const char* benchmark) {
@@ -135,6 +143,7 @@ UBUT_FORCEINLINE int ubench_should_filter(const char* filter,
 	return 0;
 }
 
+#endif // UBENCH_IMPLEMENTATION
 
 /* Informational switches */
 #define HELP_STR "--help"
@@ -151,11 +160,11 @@ UBUT_FORCEINLINE int ubench_should_filter(const char* filter,
 #define  PFX_PASSED "[  PASSED  ]"
 #define      PFX_OK "[      OK  ]"
 
-/*UBUT_FORCEINLINE*/ /*UBUT_NOINLINE*/ UBUT_EXTERN int ubench_main(int /*argc*/, const char* const /*argv*/ []);
+/*UBUT_FORCEINLINE*/ /*UBUT_NOINLINE*/  int ubench_main(int /*argc*/, const char* const /*argv*/ []);
 
 #ifdef UBENCH_IMPLEMENTATION
 
-/*UBUT_FORCEINLINE*/ /*UBUT_NOINLINE*/ UBUT_EXTERN int ubench_main(int argc, const char* const argv[]) {
+/*UBUT_FORCEINLINE*/ /*UBUT_NOINLINE*/  int ubench_main(int argc, const char* const argv[]) {
 	ubut_uint64_t failed = 0;
 	size_t index = 0;
 	size_t* failed_benchmarks = UBUT_NULL;
@@ -449,9 +458,13 @@ UBUT_C_FUNC UBUT_NOINLINE void ubench_do_nothing(void* const);
    We also use this to define the 'do nothing' method that lets us keep data
    that the compiler would normally deem is dead for the purposes of timing.
 */
+#ifdef UBENCH_IMPLEMENTATION
+
 #define UBENCH_STATE                                                         \
   UBENCH_DECLARE_DO_NOTHING() ;                                                 \
   struct ubench_state_s ubench_state = {0, 0, 0, 2.5}
+
+#endif // UBENCH_IMPLEMENTATION
 
 /*
    define a main() function to call into ubench.h and start executing
@@ -466,5 +479,5 @@ UBUT_C_FUNC UBUT_NOINLINE void ubench_do_nothing(void* const);
 	return ubench_main(argc, argv);      \
   }
 */
-
+UBUT_END_EXTERN_C
 #endif /* UBUT_UBENCH_H_INCLUDED */

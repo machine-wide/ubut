@@ -6,7 +6,7 @@
 */
 
 #include "ubut_top.h"
-#include "ubut_print.h"
+// #include "ubut_print.h"
 
 typedef void (*ubench_benchmark_t)(ubut_int64_t* const, const ubut_int64_t);
 

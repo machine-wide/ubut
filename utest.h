@@ -12,7 +12,7 @@
 #define SHEREDOM_UTEST_H_INCLUDED
 
 #include "ubut_top.h"
-#include "ubut_print.h"
+// #include "ubut_print.h"
 
 // clang-cl.exe has them both defined
 // _MSC_VER and __clang__

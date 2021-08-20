@@ -21,6 +21,8 @@
 #define UBUT_WARN(...) dbj_log_warn(__VA_ARGS__)
 #define UBUT_ERROR(...) dbj_log_error(__VA_ARGS__)
 #define UBUT_FATAL(...) dbj_log_fatal(__VA_ARGS__)
+#else
+#error If not using simple log, what are you using?
 #endif // ! DBJ_UBUT_SIMPLE_LOG
 
 #endif // UBUT_PRINT_INC_

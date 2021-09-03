@@ -335,7 +335,7 @@ If you check at runtime and stop if running bellow W10, in that respect you will
 #endif
 
 
-#define DBJ_UBUT_SIMPLE_LOG // THE BIG ISSUE
+#undef DBJ_UBUT_SIMPLE_LOG // THE BIG ISSUE
 
 #ifdef DBJ_UBUT_SIMPLE_LOG
 #define DBJ_SIMPLELOG_USER_DEFINED_MACRO_NAMES

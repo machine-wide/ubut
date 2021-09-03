@@ -359,7 +359,7 @@ If you check at runtime and stop if running bellow W10, in that respect you will
 // If not using simple log, what are you using?
 #define UBUT_TRACE(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_GRAY), fprintf(stderr, __VA_ARGS__)
 #define UBUT_DEBUG(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_GREEN), fprintf(stderr, __VA_ARGS__)
-#define UBUT_INFO(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_CYAN), fprintf(stderr, __VA_ARGS__)
+#define UBUT_INFO(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_RESET), fprintf(stderr, __VA_ARGS__)
 #define UBUT_WARN(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_YELLOW), fprintf(stderr, __VA_ARGS__)
 #define UBUT_ERROR(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_RED), fprintf(stderr, __VA_ARGS__)
 #define UBUT_FATAL(...) fprintf(stderr, UBUT_VT_RESET "\n" UBUT_VT_RED), fprintf(stderr, __VA_ARGS__)

@@ -329,10 +329,10 @@ UBUT_FORCEINLINE int ubench_should_filter(const char *filter,
 				deviation += v * v;
 			}
 
-			deviation = sqrt(deviation / iterations);
+			deviation = ubut_sqrt(deviation / iterations);
 
 			// Confidence is the 99% confidence index - whose magic value is 2.576.
-			confidence = 2.576 * deviation / sqrt(UBUT_CAST(double, iterations));
+			confidence = 2.576 * deviation / ubut_sqrt(UBUT_CAST(double, iterations));
 			confidence = (confidence / avg_ns) * 100;
 
 			deviation = (deviation / avg_ns) * 100;

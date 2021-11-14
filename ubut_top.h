@@ -73,7 +73,8 @@ set the WINVER and _WIN32_WINNT macros to the oldest supported platform
 #include <crtdbg.h>
 #include <errno.h>
 #include <stdbool.h>
-#include <math.h>
+// ubut_sqrt replaced sqrt
+// #include <math.h> 
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -245,6 +246,23 @@ typedef unsigned __int64 ubut_uint64_t;
 #endif
 
 UBUT_BEGIN_EXTERN_C
+
+// https://stackoverflow.com/a/54143846/10870835
+// ubench requires math.h just because of sqrt, thus
+// we will provide our own
+UBUT_FORCEINLINE double ubut_sqrt( double number )
+{
+    static const float threehalfs = 1.5F;
+
+    float x2 = number * 0.5F;
+    float y  = number;
+    long i  = * ( long * ) &y;      // evil floating point bit level hacking
+    i  = 0x5f3759df - ( i >> 1 );   // ;)
+    y  = * ( float * ) &i;
+    y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
+
+    return y;
+}
 
 UBUT_FORCEINLINE int ubut_strncmp(const char *a, const char *b, size_t n)
 	{
